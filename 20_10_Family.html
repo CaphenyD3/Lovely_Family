@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Ngày Phụ Nữ Việt Nam 20/10</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Be Vietnam Pro & Dancing Script -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Three.js Library & OrbitControls via cdnjs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        * {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .font-cursive {
+            font-family: 'Dancing Script', cursive;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #08020e;
+            color: #ffffff;
+        }
+        /* Glassmorphism & Glow styles */
+        .glass-panel {
+            background: rgba(22, 9, 32, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(244, 114, 182, 0.25);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(236, 72, 153, 0.15);
+        }
+        .text-glow-pink {
+            text-shadow: 0 0 12px rgba(244, 114, 182, 0.9), 0 0 24px rgba(236, 72, 153, 0.6);
+        }
+        .text-glow-gold {
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.9), 0 0 20px rgba(245, 158, 11, 0.6);
+        }
+        
+        /* 3D Canvas container */
+        #canvas3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            cursor: grab;
+        }
+        #canvas3d:active {
+            cursor: grabbing;
+        }
+
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(244, 114, 182, 0.4);
+            border-radius: 10px;
+        }
+
+        /* Modal transitions */
+        .modal-backdrop {
+            transition: opacity 0.35s ease-in-out;
+        }
+        .modal-card {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal-hidden .modal-card {
+            transform: scale(0.88) translateY(20px);
+        }
+        .modal-visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-visible .modal-card {
+            transform: scale(1) translateY(0);
+        }
+    </style>
+</head>
+<body class="relative w-full h-full">
+
+    <!-- 3D Three.js WebGL Canvas -->
+    <div id="canvas3d"></div>
+
+    <!-- UI Overlay Layer -->
+    <div class="relative z-10 w-full h-full flex flex-col justify-between p-4 pointer-events-none">
+        
+        <!-- Top Header Banner -->
+        <header class="w-full max-w-xl mx-auto text-center pt-2 sm:pt-4">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel mb-2 pointer-events-auto">
+                <i data-lucide="sparkles" class="w-4 h-4 text-amber-300 animate-pulse"></i>
+                <span class="text-xs sm:text-sm font-semibold tracking-wider text-pink-200 uppercase">
+                    To my Lovely Family
+                </span>
+                <i data-lucide="sparkles" class="w-4 h-4 text-amber-300 animate-pulse"></i>
+            </div>
+            <h1 class="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-rose-300 to-amber-200 font-cursive text-glow-pink">
+                Happy Vietnamese Women's Day 20/10
+            </h1>
+            <p class="text-xs sm:text-sm text-pink-200/80 mt-1 font-light italic">
+                Xoay chuột hoặc vuốt màn hình để khám phá không gian 3D 💫
+            </p>
+        </header>
+
+        <!-- Center Interactive Mail Button -->
+        <div class="my-auto text-center pointer-events-auto">
+            <button id="openMailBtn" class="group relative px-6 py-3.5 sm:px-8 sm:py-4 rounded-2xl bg-gradient-to-r from-pink-600/90 via-rose-500/90 to-purple-600/90 border border-pink-300/40 text-white font-medium shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 glass-panel flex items-center justify-center gap-3 mx-auto">
+                <div class="relative">
+                    <i data-lucide="mail-heart" class="w-6 h-6 sm:w-7 sm:h-7 text-pink-100 group-hover:animate-bounce"></i>
+                    <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                    </span>
+                </div>
+                <span class="text-sm sm:text-lg font-semibold tracking-wide text-glow-gold">Không phải tâm thư</span>
+            </button>
+        </div>
+
+        <!-- Bottom Controls & Camera Presets -->
+        <footer class="w-full max-w-2xl mx-auto flex flex-col items-center gap-3 pb-2 pointer-events-auto">
+            <!-- Camera Presets Switcher -->
+            <div class="flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-2 rounded-2xl glass-panel overflow-x-auto max-w-full">
+                <span class="text-xs text-pink-300 font-medium px-2 hidden sm:inline-block">Góc nhìn 3D:</span>
+                <button onclick="setCameraPreset('front')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-pink-500/20 border border-pink-400/30 text-pink-200 hover:bg-pink-500/40 transition whitespace-nowrap flex items-center gap-1">
+                    <i data-lucide="eye" class="w-3.5 h-3.5"></i> Chính Diện
+                </button>
+                <button onclick="setCameraPreset('top')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-pink-500/20 border border-pink-400/30 text-pink-200 hover:bg-pink-500/40 transition whitespace-nowrap flex items-center gap-1">
+                    <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i> Từ Trên Xuống
+                </button>
+                <button onclick="setCameraPreset('art')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-pink-500/20 border border-pink-400/30 text-pink-200 hover:bg-pink-500/40 transition whitespace-nowrap flex items-center gap-1">
+                    <i data-lucide="compass" class="w-3.5 h-3.5"></i> Góc Nghiêng
+                </button>
+                <button onclick="setCameraPreset('follow')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-pink-500/20 border border-pink-400/30 text-pink-200 hover:bg-pink-500/40 transition whitespace-nowrap flex items-center gap-1">
+                    <i data-lucide="sparkle" class="w-3.5 h-3.5"></i> Theo Hạt Mưa
+                </button>
+            </div>
+
+            <!-- Audio Hint -->
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/50 border border-pink-500/20 text-[11px] sm:text-xs text-pink-200/80">
+                <i data-lucide="music" class="w-3 h-3 text-rose-400 animate-pulse"></i>
+                <span>Âm nhạc tự động phát khi bạn chạm màn hình</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Multi-Recipient Greeting Modal -->
+    <div id="wishesModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md modal-backdrop modal-hidden">
+        <div class="modal-card relative w-full max-w-2xl rounded-3xl glass-panel p-5 sm:p-8 text-white shadow-2xl flex flex-col max-h-[88vh]">
+            
+            <!-- Close Button -->
+            <button id="closeModalBtn" class="absolute top-4 right-4 p-2 text-pink-300 hover:text-white rounded-full bg-white/10 hover:bg-white/20 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="text-center mb-4 pr-6">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white shadow-lg mb-2">
+                    <i data-lucide="heart-handshake" class="w-6 h-6 fill-white"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold font-cursive text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-rose-200 to-amber-200">
+                    Gửi Trọn Lời Chúc Yêu Thương 💖
+                </h2>
+                <p class="text-xs text-pink-200/70 mt-1">Không phải tâm thư, 99% Chat GPT ✨</p>
+            </div>
+
+            <!-- Recipient Tabs -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 pt-1 px-1 custom-scrollbar mb-4 border-b border-pink-500/20" id="tabsContainer">
+                <!-- Dynamic tabs rendered via JS -->
+            </div>
+
+            <!-- Letter Body -->
+            <div id="letterContent" class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4 text-sm sm:text-base text-pink-100/90 leading-relaxed font-light">
+                <!-- Content injected dynamically -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="mt-5 pt-3 border-t border-pink-500/20 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <button id="copyWishBtn" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-pink-900/40 hover:bg-pink-800/60 border border-pink-400/30 text-xs sm:text-sm font-medium text-pink-200 flex items-center justify-center gap-2 transition">
+                    <i data-lucide="copy" class="w-4 h-4 text-amber-300"></i>
+                    <span id="copyBtnText">Sao chép lời chúc này</span>
+                </button>
+                <button id="closeModalTextBtn" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 text-white text-xs sm:text-sm font-semibold shadow-md hover:brightness-110 transition">
+                    Đóng Thư
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script>
+        // --- 1. DATA: MULTI-RECIPIENT LETTERS ---
+        const RECIPIENTS = [
+            {
+                id: "me",
+                title: "Gửi mẹ",
+                icon: "heart-handshake",
+                header: "Gửi Mẹ Của Con 🌸",
+                quote: "Mẹ là người phụ nữ tuyệt vời nhất trong cuộc đời con!",
+                content: [
+                    "Con chúc Mẹ ngày 20/10 luôn tràn ngập niềm vui, sức khỏe dồi dào và mãi bình an bên gia đình.",
+                    "Cảm ơn Mẹ đã luôn hy sinh, chăm sóc và dành trọn tình yêu thương bao la cho tụi con. Chúc Mẹ có thể mỗi ngày đều có nụ cười trên môi, không còn lo âu phiền phiền muộn vì những chuyện nhỏ nhặt nữa.",
+                    "Mong Mẹ luôn sống vui, sống khỏe và mãi là chỗ dựa ấm áp nhất của con!"
+                ]
+            },
+            {
+                id: "bi",
+                title: "Gửi Bị",
+                icon: "heart",
+                header: "Gửi Bẹo Bí 🌷",
+                quote: "Thật ra anh không biết nên để thư cho 2 đứa hay 1 đứa thôi, nhưng thôi cứ để 2 đứa cho vui.",
+                content: [
+                    "Nhân ngày Phụ nữ Việt Nam 20/10, chúc em luôn mạnh khỏe, hạnh phúc và đặc biệt là luôn xinh đẹp kèm học giỏi nữa nhé!",
+                    "Anh nghĩ là nội tại m giỏi sẵn rồi nên đừng vì những lần kiểm tra không được mà chùn bước, thay vào đó hãy coi đó là động lực để m cố gắng hơn nữa, nhìn lại và khắc phục những sai sót đã mắc phải. Anh tin là m sẽ làm được, tin đứa kia nữa, vì anh biết 2 đứa có thực lực và sự kiên trì. Còn nếu khó quá không qua nổi thì còn có anh mà, quên rồi sao, sẵn sàng support 100% nội tại",
+                    "Nếu có thể, anh mong em có thể bớt căng thẳng lại khi bị anh chọc (nó là tất yếu rồi, không có vụ ngưng đâu=))), và hãy luôn giữ nụ cười trên môi, vì nụ cười của em là điều khiến anh cảm thấy ấm áp nhất. Ọe",
+                    "Cảm ơn 1 con hổ con"
+                ]
+            },
+            {
+                id: "bem",
+                title: "Gửi Bem",
+                icon: "gift",
+                header: "Gửi Bem Bels, tất nhiên rồi 🌺",
+                quote: "Gửi đến em gái của anh, kẻ nắm giữ 99,86% trọng lượng của gia đình",
+                content: [
+                    "Chúc em ngày 20/10 luôn xinh đẹp rạng ngời, vui tươi và tràn đầy năng lượng tích cực.",
+                    "Hãy luôn tự tin, mạnh mẽ và theo đuổi những ước mơ của mình. Nếu cảm thấy căng thẳng khi học tập, hãy chia sẻ với anh, anh sẽ giúp 2 đứa m vượt qua bằng tất cả những gì anh có. Anh tin rằng em sẽ đạt được mọi điều tốt đẹp mà em mong muốn.",
+                    "Hãy luôn là phiên bản tuyệt vời nhất của chính mình nhé!",
+                    "À quên, cảm ơn vì những lần chọc lét=))"
+                ]
+            },
+            {
+                id: "ba",
+                title: "Gửi Ba",
+                icon: "book",
+                header: "Gửi Ba",
+                quote: "À quên nữa, nay 20/10 mà, ba làm gì có phần đâu",
+                content: [
+                    "Hẹn ba vào 19/11 nhé!"
+                ]
+            }
+        ];
+
+        // --- 2. THREE.JS 3D WISHES RAIN SCENE ---
+        const WISH_SHORT_TEXTS = [
+            "Mẹ tuyệt vời nhất! 💖",
+            "Đan Nhi 🌸",
+            "Xuân Nhi 🌷",
+            "Bẹo bí",
+            "Bem bél",
+            "Có ba nữa nè",
+            "Ai eo",
+            "Lovely Family",
+            "🎉 Happy 20/10 Day"
+        ];
+
+        const EMOJI_LIST = ["🌸", "🌹", "🌷", "🌺", "💖", "✨", "🎀", "👑", "🌼", "💐", "⭐"];
+        const COLOR_LIST = ["#f472b6", "#ec4899", "#f43f5e", "#fbbf24", "#e879f9", "#ffffff"];
+
+        let scene, camera, renderer, controls;
+        let rainSprites = [];
+        const RAIN_COUNT = 320; // Number of 3D rain streams/text elements
+
+        // Helper: Create Canvas Sprite Texture for 3D Text
+        function createTextSprite(text, color) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
+
+            ctx.font = 'bold 36px "Be Vietnam Pro", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Glow effect
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = color;
+            ctx.fillText(text, 256, 64);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const spriteMaterial = new THREE.SpriteMaterial({
+                map: texture,
+                transparent: true,
+                blending: THREE.AdditiveBlending
+            });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(16, 4, 1);
+            return sprite;
+        }
+
+        function init3DScene() {
+            const container = document.getElementById('canvas3d');
+
+            // Scene
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x08020e, 0.008);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 5, 85);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            // OrbitControls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.rotateSpeed = 0.8;
+            controls.zoomSpeed = 1.0;
+            controls.maxDistance = 160;
+            controls.minDistance = 10;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xec4899, 2, 200);
+            pointLight.position.set(0, 20, 0);
+            scene.add(pointLight);
+
+            // Create Rain Sprites
+            for (let i = 0; i < RAIN_COUNT; i++) {
+                const randomWish = WISH_SHORT_TEXTS[Math.floor(Math.random() * WISH_SHORT_TEXTS.length)];
+                const randomEmoji = EMOJI_LIST[Math.floor(Math.random() * EMOJI_LIST.length)];
+                const randomColor = COLOR_LIST[Math.floor(Math.random() * COLOR_LIST.length)];
+                
+                const sprite = createTextSprite(`${randomEmoji} ${randomWish}`, randomColor);
+
+                // Spread in 3D box volume
+                sprite.position.x = (Math.random() - 0.5) * 160;
+                sprite.position.y = (Math.random() - 0.5) * 160;
+                sprite.position.z = (Math.random() - 0.5) * 160;
+
+                // Store custom fall properties
+                sprite.userData = {
+                    speed: Math.random() * 0.35 + 0.15,
+                    resetY: 80,
+                    bottomY: -80,
+                    swaySpeed: Math.random() * 0.02 + 0.005,
+                    swayOffset: Math.random() * Math.PI * 2
+                };
+
+                scene.add(sprite);
+                rainSprites.push(sprite);
+            }
+
+            // Window resize handler
+            window.addEventListener('resize', onWindowResize);
+
+            // Start animation loop immediately
+            animate3D();
+        }
+
+        let isFollowMode = false;
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
+            // Animate rain movement
+            const time = Date.now() * 0.001;
+            rainSprites.forEach(sprite => {
+                sprite.position.y -= sprite.userData.speed;
+                sprite.position.x += Math.sin(time * 2 + sprite.userData.swayOffset) * 0.05;
+
+                // Reset position if fell below bottom
+                if (sprite.position.y < sprite.userData.bottomY) {
+                    sprite.position.y = sprite.userData.resetY;
+                    sprite.position.x = (Math.random() - 0.5) * 160;
+                    sprite.position.z = (Math.random() - 0.5) * 160;
+                }
+            });
+
+            // Follow camera preset rotation
+            if (isFollowMode) {
+                camera.position.x = Math.sin(time * 0.2) * 75;
+                camera.position.z = Math.cos(time * 0.2) * 75;
+                camera.lookAt(0, 0, 0);
+            }
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // --- 3. CAMERA PRESETS ---
+        function setCameraPreset(type) {
+            isFollowMode = false;
+            switch(type) {
+                case 'front':
+                    animateCameraPosition(0, 5, 85);
+                    break;
+                case 'top':
+                    animateCameraPosition(0, 110, 10);
+                    break;
+                case 'art':
+                    animateCameraPosition(65, 45, 65);
+                    break;
+                case 'follow':
+                    isFollowMode = true;
+                    break;
+            }
+        }
+
+        function animateCameraPosition(tx, ty, tz) {
+            const start = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
+            const startTime = Date.now();
+            const duration = 1000;
+
+            function step() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+
+                camera.position.x = start.x + (tx - start.x) * ease;
+                camera.position.y = start.y + (ty - start.y) * ease;
+                camera.position.z = start.z + (tz - start.z) * ease;
+                camera.lookAt(0, 0, 0);
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            }
+            step();
+        }
+
+        // --- 4. CUSTOM BACKGROUND MUSIC ---
+        let backgroundMusic = null;
+        let isAudioStarted = false;
+
+        function initAudio() {
+            if (isAudioStarted) return;
+            
+            try {
+                // Tạo đối tượng Audio với file nhạc tùy chỉnh của bạn
+                // Thay 'background-song.mp3' bằng đường dẫn đến file nhạc của bạn
+                backgroundMusic = new Audio('I_love_you.mp4');
+                
+                // Cài đặt cho phép lặp lại bài hát khi phát hết
+                backgroundMusic.loop = true;
+                
+                // Điều chỉnh âm lượng từ 0.0 đến 1.0 (ví dụ: 0.4 là vừa phải, nhẹ nhàng)
+                backgroundMusic.volume = 0.8;
+                
+                // Phát nhạc
+                backgroundMusic.play().then(() => {
+                    isAudioStarted = true;
+                    console.log("Đang phát bài hát tùy chỉnh thành công!");
+                }).catch(error => {
+                    console.log("Trình duyệt chặn phát tự động hoặc lỗi file:", error);
+                });
+
+            } catch (e) {
+                console.log("Lỗi khởi tạo âm thanh:", e);
+            }
+        }
+
+        // Lắng nghe sự kiện click hoặc chạm màn hình đầu tiên của người dùng
+        window.addEventListener("click", initAudio, { once: true });
+        window.addEventListener("touchstart", initAudio, { once: true });
+
+        // --- 5. MULTI-RECIPIENT MODAL LOGIC ---
+        const wishesModal = document.getElementById("wishesModal");
+        const openMailBtn = document.getElementById("openMailBtn");
+        const closeModalBtn = document.getElementById("closeModalBtn");
+        const closeModalTextBtn = document.getElementById("closeModalTextBtn");
+        const tabsContainer = document.getElementById("tabsContainer");
+        const letterContent = document.getElementById("letterContent");
+        const copyWishBtn = document.getElementById("copyWishBtn");
+        const copyBtnText = document.getElementById("copyBtnText");
+
+        let activeTabId = RECIPIENTS[0].id;
+
+        function renderTabs() {
+            tabsContainer.innerHTML = "";
+            RECIPIENTS.forEach((item) => {
+                const isActive = item.id === activeTabId;
+                const btn = document.createElement("button");
+                btn.className = `px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap flex items-center gap-1.5 transition-all duration-200 border ${
+                    isActive
+                        ? "bg-gradient-to-r from-pink-500 to-rose-500 border-pink-300 text-white shadow-md scale-105"
+                        : "bg-slate-800/60 border-pink-500/20 text-pink-200 hover:bg-pink-900/40"
+                }`;
+                btn.innerHTML = `<i data-lucide="${item.icon}" class="w-3.5 h-3.5"></i> ${item.title}`;
+                btn.onclick = () => {
+                    activeTabId = item.id;
+                    renderTabs();
+                    renderLetterContent();
+                };
+                tabsContainer.appendChild(btn);
+            });
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function renderLetterContent() {
+            const data = RECIPIENTS.find(r => r.id === activeTabId) || RECIPIENTS[0];
+            const paragraphsHtml = data.content.map(p => `<p>${p}</p>`).join("");
+            
+            letterContent.innerHTML = `
+                <div class="space-y-3">
+                    <div class="h-px bg-gradient-to-r from-pink-500/30 via-pink-400/10 to-transparent my-2"></div>
+                    <div class="space-y-2.5 text-xs sm:text-sm leading-relaxed text-pink-100/90">
+                        ${paragraphsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function openModal() {
+            wishesModal.classList.remove("modal-hidden");
+            wishesModal.classList.add("modal-visible");
+            renderTabs();
+            renderLetterContent();
+        }
+
+        function closeModal() {
+            wishesModal.classList.remove("modal-visible");
+            wishesModal.classList.add("modal-hidden");
+        }
+
+        openMailBtn.addEventListener("click", openModal);
+        closeModalBtn.addEventListener("click", closeModal);
+        closeModalTextBtn.addEventListener("click", closeModal);
+
+        wishesModal.addEventListener("click", (e) => {
+            if (e.target === wishesModal) closeModal();
+        });
+
+        // Copy wish text logic
+        copyWishBtn.addEventListener("click", () => {
+            const data = RECIPIENTS.find(r => r.id === activeTabId);
+            if (!data) return;
+            const fullText = `${data.content.join("\n\n")}\n\nHappy women's day 20/10! 🌹`;
+            
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = fullText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempTextArea);
+
+            copyBtnText.innerText = "Đã sao chép!";
+            setTimeout(() => {
+                copyBtnText.innerText = "Sao chép lời chúc này";
+            }, 2000);
+        });
+
+        // START ON LOAD
+        window.onload = () => {
+            init3DScene();
+            setCameraPreset('follow');
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        };
+    </script>
+</body>
+</html>
