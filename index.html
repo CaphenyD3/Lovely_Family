@@ -534,6 +534,12 @@
             
             letterContent.innerHTML = `
                 <div class="space-y-3">
+                    <h3 class="text-xl sm:text-2xl font-bold font-cursive text-pink-200 text-glow-pink">
+                        ${data.header}
+                    </h3>
+                    <p class="text-xs sm:text-sm text-amber-300 italic font-serif border-l-2 border-pink-400 pl-3 py-0.5">
+                        "${data.quote}"
+                    </p>
                     <div class="h-px bg-gradient-to-r from-pink-500/30 via-pink-400/10 to-transparent my-2"></div>
                     <div class="space-y-2.5 text-xs sm:text-sm leading-relaxed text-pink-100/90">
                         ${paragraphsHtml}
@@ -566,7 +572,7 @@
         copyWishBtn.addEventListener("click", () => {
             const data = RECIPIENTS.find(r => r.id === activeTabId);
             if (!data) return;
-            const fullText = `${data.content.join("\n\n")}\n\nHappy women's day 20/10! 🌹`;
+            const fullText = `${data.header}\n\n${data.content.join("\n\n")}\n\nChúc mừng ngày 20/10! 🌹`;
             
             const tempTextArea = document.createElement("textarea");
             tempTextArea.value = fullText;
